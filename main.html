@@ -26,6 +26,11 @@
       main {
         height: 77%;
         background-color: white;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        gap: 20px;
+        overflow-y: auto;
       }
       footer {
         height: 10%;
@@ -57,6 +62,22 @@
         color: white;
         font-weight: bold;
       }
+      .send {
+        background-color: green;
+        color: white;
+        padding: 10px 30px;
+        align-self: flex-end;
+        border-top-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+      }
+      .received {
+        background-color: rgb(66, 63, 63);
+        color: white;
+        padding: 10px 30px;
+        align-self: flex-start;
+        border-top-right-radius: 20px;
+        border-bottom-left-radius: 20px;
+      }
     </style>
   </head>
 
@@ -68,10 +89,61 @@
     <main></main>
 
     <footer>
-      <form id="form" onsubmit="sendMessage(event)">
+      <form id="form" onsubmit="sendDataToServer(event)">
         <input type="text" placeholder="Type Message Here...." />
         <button>Send</button>
       </form>
     </footer>
+
+    <!--Integrating with Socket IO-->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      //It is used to send connection request
+      const socket = io();
+      var main = document.querySelector("main");
+
+      //On click on send button, send data to server
+      function sendDataToServer(event) {
+        event.preventDefault();
+        var inputDomElement = document.querySelector("input");
+
+        var message = inputDomElement.value;
+
+        //sending data to server
+        socket.emit("chat message", message);
+
+        //create a div element
+        const div = document.createElement("div");
+
+        //assign css class to div element
+        div.classList.add("send");
+
+        //assign textbox data to div element
+        div.textContent = message;
+
+        //Add div element inside the main section
+        main.appendChild(div);
+
+        main.scrollTop = mainDomElement.scrollHeight;
+      }
+
+      //receving the data from server
+      socket.on("chat message", (my_message) => {
+        //ccreate div element
+        const div = document.createElement("div");
+
+        //assign message received from server to div element
+        div.textContent = my_message;
+
+        //add received css class to div element
+        div.classList.add("received");
+
+        //add div element into the main section
+        main.appendChild(div);
+
+        //get the controll of scrollbar to the bottom of new message
+        main.scrollTop = mainDomElement.scrollHeight;
+      });
+    </script>
   </body>
 </html>
